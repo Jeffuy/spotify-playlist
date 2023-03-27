@@ -8,9 +8,9 @@ async function fetchSongUris(songs, accessToken) {
 
 
     for (const song of songs) {
-		const sanitizedSong = song.replace(/[^a-zA-Z0-9\s]+/g, " ");
+		
         try {
-            const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(sanitizedSong)}&type=track&limit=1`, {
+            const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song)}&type=track&limit=1`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
