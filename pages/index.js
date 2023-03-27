@@ -11,17 +11,20 @@ export default function Home() {
 	const [genres, setGenres] = useState('')
 	const [numSongs, setNumSongs] = useState(0)
 	const [result, setResult] = useState([])
+	const [title, setTitle] = useState('')
+	const [playlistCreated, setPlaylistCreated] = useState(false)
 
 	const handleCreatePlaylist = async (result, accessToken) => {
 		try {
 			const response = await axios.post('/api/spotify', {
 				songs: result,
-				playlistName: 'My nueva playlist',
+				playlistName: title,
 				userId: session.token.sub, // El ID de usuario de Spotify
 				accessToken, // El token de acceso de Spotify
 			});
 
 			console.log('Playlist creada:', response.data.playlistId);
+			setPlaylistCreated(true)
 		} catch (error) {
 			console.error('Error creando la playlist:', error);
 		}
@@ -46,7 +49,9 @@ export default function Home() {
 			if (response.ok) {
 				const data = await response.json()
 				setResult(data.result)
+				setTitle(data.title)
 				setAccessToken(session.token.accessToken)
+
 			}
 		} catch (error) {
 			console.error(error)
@@ -150,7 +155,7 @@ export default function Home() {
 				<div className={styles.result}>
 					{result.length > 0 && (
 						<>
-							<h2>Playlist Creada</h2>
+							<h2>{title}</h2>
 							<ul>
 								{result.map((song, index) => (
 									<li key={index}>
@@ -162,6 +167,7 @@ export default function Home() {
 							<button onClick={() => handleCreatePlaylist(result, accessToken)} className={styles.button}>
 								Crear Playlist en Spotify
 							</button>
+							{playlistCreated && <p>Playlist creada con éxito!</p>}
 						</>
 					)}
 				</div>

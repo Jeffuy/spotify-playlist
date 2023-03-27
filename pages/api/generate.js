@@ -38,8 +38,9 @@ export default async function generate(req, res) {
 		const textResult = completion.data.choices[0].message.content;
 
 		let arrayResult = textResultToArray(textResult);
+		let title = extractTitle(textResult);
 		
-		res.status(200).json({ result: arrayResult });
+		res.status(200).json({ result: arrayResult, title });
 	} catch (error) {
 		// Consider adjusting the error handling logic for your use case
 		if (error.response) {
@@ -60,7 +61,7 @@ export default async function generate(req, res) {
 function generatePrompt(typeOfPlaylist, genres, numSongs) {
 	const capitalizedTypeOfPlaylist =
 		typeOfPlaylist[0].toUpperCase() + typeOfPlaylist.slice(1).toLowerCase();
-	return `Crea una playlist de ${numSongs} canciones de ${genres} de tipo ${capitalizedTypeOfPlaylist}. Solo responderás con la lista de canciones. A cada elemento le agregaras la etiqueta <cancion> y </cancion>. Ejemplo: <cancion>Nombre de la cancion - artista</cancion>.`;
+	return `Crea una playlist de ${numSongs} canciones de ${genres} de tipo ${capitalizedTypeOfPlaylist}. Solo responderás con la lista de canciones. A cada elemento le agregaras la etiqueta <cancion> y </cancion>. Ejemplo: <cancion>Nombre de la cancion - artista</cancion>. Le agregaras un titulo a la playlist entre las etiquetas <titulo> y </titulo>. Ejemplo: <titulo>Nombre de la playlist</titulo>.`;
 }
 
 function textResultToArray(textResult) {
@@ -73,4 +74,17 @@ function textResultToArray(textResult) {
 		songs.push(match[1]);
 	}
 	return songs;
+}
+
+function extractTitle(textResult) {
+	const regex = /<titulo>(.*?)<\/titulo>/g;
+
+	const title = [];
+	let match;
+
+	while ((match = regex.exec(textResult)) !== null) {
+		title.push(match[1]);
+	}
+	return title[0];
+
 }
