@@ -61,7 +61,11 @@ export default async function generate(req, res) {
 function generatePrompt(typeOfPlaylist, genres, numSongs) {
 	const capitalizedTypeOfPlaylist =
 		typeOfPlaylist[0].toUpperCase() + typeOfPlaylist.slice(1).toLowerCase();
-	return `Crea una playlist de ${numSongs} canciones de ${genres} de tipo ${capitalizedTypeOfPlaylist}. Solo responderás con la lista de canciones. A cada elemento le agregaras la etiqueta <cancion> y </cancion>. Ejemplo: <cancion>Nombre de la cancion - artista</cancion>. Le agregaras un titulo a la playlist entre las etiquetas <titulo> y </titulo>. Ejemplo: <titulo>Nombre de la playlist</titulo>.`;
+	return `Crea una playlist que cumpla con lo siguiente:
+	Cantidad de canciones: ${numSongs}.
+	Generos: ${genres}
+	Tipo: ${capitalizedTypeOfPlaylist}. 
+	Solo responderás con la lista de canciones. A cada elemento le agregaras la etiqueta <cancion> y </cancion>. Ejemplo: <cancion>Nombre de la cancion - artista</cancion>. Le agregaras un titulo a la playlist entre las etiquetas <titulo> y </titulo>. Ejemplo: <titulo>Nombre de la playlist</titulo>.`;
 }
 
 function textResultToArray(textResult) {
