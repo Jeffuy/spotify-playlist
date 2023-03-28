@@ -8,6 +8,8 @@ const nextConfig = {
 		NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
 		NEXT_SECRET: process.env.NEXT_SECRET,
 		OPENAI_API_KEY: process.env.OPEN_AI_API_KEY,
+		NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+
 	},
 }
 
