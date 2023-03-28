@@ -2,58 +2,58 @@ import axios from "axios";
 
 // Aquí van las funciones fetchSongUris y createSpotifyPlaylist
 async function fetchSongUris(songs, accessToken) {
-    const songUris = [];
+	const songUris = [];
 	//eliminar todo lo que haya antes de un guion en cada elemento del array songs
-	
 
 
-    for (const song of songs) {
-		
-        try {
-            const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song)}&type=track&limit=1`, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
 
-            if (response.data.tracks.items.length > 0) {
-                songUris.push(response.data.tracks.items[0].uri);
-            }
-        } catch (error) {
-            console.error(`Error fetching song "${song}":`, error);
-        }
-    }
+	for (const song of songs) {
 
-    return songUris;
+		try {
+			const response = await axios.get(`https://api.spotify.com/v1/search?q=track:${encodeURIComponent(song.name)}%20artist:${encodeURIComponent(song.artist)}&type=track&limit=1`, {
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			});
+
+			if (response.data.tracks.items.length > 0) {
+				songUris.push(response.data.tracks.items[0].uri);
+			}
+		} catch (error) {
+			console.error(`Error fetching song "${song}":`, error);
+		}
+	}
+
+	return songUris;
 }
 
 async function createSpotifyPlaylist(userId, playlistName, songUris, accessToken) {
-    try {
-        const playlistResponse = await axios.post(`https://api.spotify.com/v1/users/${userId}/playlists`, {
-            name: playlistName
-        }, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
-        });
+	try {
+		const playlistResponse = await axios.post(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+			name: playlistName
+		}, {
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json'
+			}
+		});
 
-        const playlistId = playlistResponse.data.id;
+		const playlistId = playlistResponse.data.id;
 
-        await axios.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-            uris: songUris
-        }, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
-        });
+		await axios.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+			uris: songUris
+		}, {
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json'
+			}
+		});
 
-        return playlistId;
+		return playlistId;
 
-    } catch (error) {
-        console.error('Error creating playlist:', error);
-    }
+	} catch (error) {
+		console.error('Error creating playlist:', error);
+	}
 }
 
 

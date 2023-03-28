@@ -160,7 +160,7 @@ export default function Home() {
 								{result.map((song, index) => (
 									<li key={index}>
 										{index + 1} - {' '}
-										{song}
+										{song.name} - {song.artist}
 									</li>
 								))}
 							</ul>
