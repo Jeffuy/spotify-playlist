@@ -61,15 +61,11 @@ export default async function generate(req, res) {
 function generatePrompt(typeOfPlaylist, genres, numSongs) {
 	const capitalizedTypeOfPlaylist =
 		typeOfPlaylist[0].toUpperCase() + typeOfPlaylist.slice(1).toLowerCase();
-	return `Quiero que conozcas todos los titulos de todas las canciones con sus respectivos artistas. Crea una playlist que cumpla con lo siguiente:
-	Cantidad de canciones: ${numSongs}.
-	Generos: ${genres}.
-	Tipo: ${capitalizedTypeOfPlaylist}.
-	Solo responderás con la lista de canciones. No incluiras canciones que no estes seguro de su existencia o si perteneces a cierto artista. A cada elemento le agregaras la etiqueta <cancion> y </cancion>. Ejemplo: <cancion>Nombre de la cancion - artista</cancion>. Le agregaras un titulo creativo a la playlist entre las etiquetas <titulo> y </titulo>. Ejemplo: <titulo>titulo de la playlist</titulo>.`;
+	return `Crea una playlist de ${numSongs} canciones, géneros ${genres} y tipo ${capitalizedTypeOfPlaylist}. Incluye solo canciones y artistas conocidos y existentes que se ajusten al tipo de playlist. Usa <c> y </c> para cada canción y <t> y </t> para el título de la playlist. Ejemplo: <c>Nombre de la cancion - artista</c>, <t>titulo creativo para la playlist</t>.`;
 }
 
 function textResultToArray(textResult) {
-	const regex = /<cancion>(.*?)<\/cancion>/g;
+	const regex = /<c>(.*?)<\/c>/g;
 	//guarda las canciones en un object con el nombre de la cancion y el artista
 	const songs = [];
 	let match;
@@ -82,7 +78,7 @@ function textResultToArray(textResult) {
 }
 
 function extractTitle(textResult) {
-	const regex = /<titulo>(.*?)<\/titulo>/g;
+	const regex = /<t>(.*?)<\/t>/g;
 
 	const title = [];
 	let match;

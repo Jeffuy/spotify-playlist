@@ -10,7 +10,7 @@ async function fetchSongUris(songs, accessToken) {
 	for (const song of songs) {
 
 		try {
-			const response = await axios.get(`https://api.spotify.com/v1/search?q=track:${encodeURIComponent(song.name)}%20artist:${encodeURIComponent(song.artist)}&type=track&limit=1`, {
+			const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song.name)}%20${encodeURIComponent(song.artist)}&type=track&limit=1`, {
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
 				}

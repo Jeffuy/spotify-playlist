@@ -1,10 +1,12 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Audio, Bars } from "react-loader-spinner";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 export default function Home() {
+	const targetDiv = useRef(null);
 	const { data: session } = useSession()
 	const [accessToken, setAccessToken] = useState('')
 	const [playlistType, setPlaylistType] = useState('')
@@ -13,8 +15,11 @@ export default function Home() {
 	const [result, setResult] = useState([])
 	const [title, setTitle] = useState('')
 	const [playlistCreated, setPlaylistCreated] = useState(false)
+	const [loadingPlaylist, setLoadingPlaylist] = useState(false)
+	const [addingPlaylist, setAddingPlaylist] = useState(false)
 
 	const handleCreatePlaylist = async (result, accessToken) => {
+		setAddingPlaylist(true)
 		try {
 			const response = await axios.post('/api/spotify', {
 				songs: result,
@@ -28,12 +33,13 @@ export default function Home() {
 		} catch (error) {
 			console.error('Error creando la playlist:', error);
 		}
+		setAddingPlaylist(false)
 	};
 
 
 	async function onSubmit(e) {
 		e.preventDefault()
-		console.log("submitting")
+		setLoadingPlaylist(true)
 		try {
 			const response = await fetch('/api/generate', {
 				method: 'POST',
@@ -56,8 +62,18 @@ export default function Home() {
 		} catch (error) {
 			console.error(error)
 		}
+		setLoadingPlaylist(false)
 	}
-	console.log(session?.token)
+
+	useEffect(() => {
+		if (targetDiv.current) {
+			targetDiv.current.scrollIntoView({ behavior: 'smooth' });
+		}
+		// } else if (resultDiv.current) {
+		// 	resultDiv.current.scrollIntoView({ behavior: 'smooth' });
+		// }
+		console.count("scrolling")
+	}, [loadingPlaylist]);
 
 	return (
 		<div className={styles.container}>
@@ -69,10 +85,10 @@ export default function Home() {
 
 			<main className={styles.main}>
 				<h1 className={styles.title}>
-					Welcome,{' '}
+					Welcome
 					{session
-						? session.token?.name || 'friend'
-						: 'stranger'}
+						? `, ${session.token?.name}` || ''
+						: ''}
 					!
 
 				</h1>
@@ -89,7 +105,7 @@ export default function Home() {
 						<button
 							className={styles.button}
 							type="button"
-							style={{ '--accent-color': '#15883e' }}
+
 							onClick={() => signIn('spotify')}
 							disabled={session}
 						>
@@ -102,14 +118,14 @@ export default function Home() {
 					<form onSubmit={onSubmit} className={styles.form}>
 						<div className={styles.inputGroup}>
 							<label htmlFor="playlistType" className={styles.label}>
-								Tipo de Playlist:
+								Your mood:
 							</label>
 							<input
 								type="text"
 								name="playlistType"
 								id="playlistType"
 								className={styles.input}
-								placeholder="Ej: Fiesta, Relajación, etc."
+								placeholder="E.g.: party, sad, relaxed."
 								value={playlistType}
 								onChange={(e) => setPlaylistType(e.target.value)}
 							/>
@@ -117,14 +133,14 @@ export default function Home() {
 
 						<div className={styles.inputGroup}>
 							<label htmlFor="genres" className={styles.label}>
-								Géneros Musicales:
+								Genres:
 							</label>
 							<input
 								type="text"
 								name="genres"
 								id="genres"
 								className={styles.input}
-								placeholder="Ej: Rock, Pop, Reggae, etc."
+								placeholder="E.g.: Rock, Pop, Reggae, etc."
 								value={genres}
 								onChange={(e) => setGenres(e.target.value)}
 							/>
@@ -132,45 +148,70 @@ export default function Home() {
 
 						<div className={styles.inputGroup}>
 							<label htmlFor="numSongs" className={styles.label}>
-								Cantidad de Canciones:
+								Number of songs:
 							</label>
 							<input
 								type="number"
 								name="numSongs"
 								id="numSongs"
 								className={styles.input}
-								placeholder="Ej: 50"
-								min={1}
-								max={20}
-								value={numSongs}
+								placeholder="min: 10, max: 30"
+								min={10}
+								max={30}
+								value={numSongs == 0 ? '' : numSongs}
 								onChange={(e) => setNumSongs(e.target.value)}
 							/>
 						</div>
 
-						<button type="submit" className={styles.button}>
-							Crear Playlist
+						<button type="submit" className={styles.button} disabled={loadingPlaylist}>
+							Create Playlist
 						</button>
 					</form>
 				)}
-				<div className={styles.result}>
-					{result.length > 0 && (
-						<>
-							<h2>{title}</h2>
-							<ul>
-								{result.map((song, index) => (
-									<li key={index}>
-										{index + 1} - {' '}
-										{song.name} - {song.artist}
-									</li>
-								))}
-							</ul>
-							<button onClick={() => handleCreatePlaylist(result, accessToken)} className={styles.button}>
-								Crear Playlist en Spotify
-							</button>
-							{playlistCreated && <p>Playlist creada con éxito!</p>}
-						</>
-					)}
-				</div>
+				{loadingPlaylist && (<div ref={targetDiv} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+					<Audio
+						height="80"
+						width="80"
+						color="#4fa94d"
+						ariaLabel="audio-loading"
+						wrapperStyle={{}}
+						wrapperClass="wrapper-class"
+						visible={true}
+					/>
+					<p>Creating playlist...</p>
+				</div>)}
+				{result.length > 0 & !loadingPlaylist ? (
+					<div className={styles.result}>
+
+						<h2>{title}</h2>
+						<ul>
+							{result.map((song, index) => (
+								<li key={index}>
+									{index + 1} - {' '}
+									{song.name} - {song.artist}
+								</li>
+							))}
+						</ul>
+						<button onClick={() => handleCreatePlaylist(result, accessToken)} className={styles.button} disabled={addingPlaylist}>
+							Add to my Spotify account.
+						</button>
+						{addingPlaylist && (<div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1rem' }}> 
+							<Bars
+								height="60"
+								width="60"
+								color="#4fa94d"
+								ariaLabel="bars-loading"
+								wrapperStyle={{}}
+								wrapperClass=""
+								visible={true}
+							/>
+							<p>Adding playlist...</p>
+						</div>)}
+
+						{playlistCreated & !addingPlaylist ? <p>Playlist added!</p> : null}
+
+					</div>
+				) : null}
 
 			</main>
 		</div>
