@@ -2,7 +2,18 @@
 	padding: 0 2rem;
 	max-width: 720px;
 	margin: 0 auto;
+	font-size: 16px;
+	color: white;
+	background-color: #191414;
 }
+
+.container {
+	--spotify-green: #1db954;
+	--spotify-black: #191414;
+	--spotify-gray: #535353;
+	--font-size-base: 16px;
+}
+
 
 .main {
 	min-height: 100vh;
@@ -13,11 +24,6 @@
 	justify-content: center;
 	align-items: center;
 	gap: 2rem;
-}
-
-.main :any-link {
-	color: #0070f3;
-	font-weight: 700;
 }
 
 .footer {
@@ -42,6 +48,7 @@
 	line-height: 1.15;
 	font-size: 4rem;
 	text-align: center;
+	color: white;
 }
 
 .button {
@@ -49,9 +56,9 @@
 	outline: revert;
 	cursor: pointer;
 	color: white;
-	background-color: var(--accent-color, black);
+	background-color: var(--spotify-green);
 	border-radius: 9999px;
-	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	box-shadow: 0 2px 8px 0 rgb(0 0 0 / 50%);
 	padding: 1rem 2rem;
 	font-size: 1.25rem;
 	transition: all ease 75ms;
@@ -59,6 +66,7 @@
 
 .button:is(:hover, :focus):not(:disabled, :active) {
 	transform: scale(1.05);
+	background-color: var(--spotify-gray);
 }
 
 .button:disabled {
@@ -82,6 +90,7 @@
 .label {
 	font-weight: bold;
 	margin-bottom: 0.5rem;
+	color: white;
 }
 
 .input {
@@ -90,20 +99,23 @@
 	border: 1px solid #eaeaea;
 	border-radius: 4px;
 	font-size: 1rem;
+	color: white;
+	background-color: var(--spotify-gray);
 }
 
 .input:focus {
-	border-color: #0070f3;
+	border-color: var(--spotify-green);
 	outline: none;
 }
 
 .button {
 	margin-top: 1rem;
+	text-align: center;
 }
 
 .result {
 	width: 100%;
-	background-color: #f3f3f3;
+	background-color: var(--spotify-gray);
 	border-radius: 4px;
 	padding: 2rem;
 	margin-top: 2rem;
@@ -124,4 +136,31 @@
 	font-size: 1.25rem;
 	line-height: 1.5;
 	margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+	.main {
+		padding: 2rem 0;
+	}
+
+	.title {
+		font-size: 3rem;
+	}
+
+	.button {
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+	}
+
+	.input {
+		font-size: 0.875rem;
+	}
+
+	.result h2 {
+		font-size: 1.25rem;
+	}
+
+	.result li {
+		font-size: 1rem;
+	}
 }
