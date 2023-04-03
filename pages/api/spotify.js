@@ -1,29 +1,55 @@
 import axios from "axios";
 
 // Aquí van las funciones fetchSongUris y createSpotifyPlaylist
-async function fetchSongUris(songs, accessToken) {
+async function fetchSongUris(songs, accessToken, searchMode) {
 	const songUris = [];
 	//eliminar todo lo que haya antes de un guion en cada elemento del array songs
 
 
+	if (searchMode === "relaxed") {
 
-	for (const song of songs) {
 
-		try {
-			const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song.name)}%20${encodeURIComponent(song.artist)}&type=track&limit=1`, {
-				headers: {
-					'Authorization': `Bearer ${accessToken}`
+		for (const song of songs) {
+
+			try {
+				const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song.name)}%20${encodeURIComponent(song.artist)}&type=track&limit=1`, {
+					headers: {
+						'Authorization': `Bearer ${accessToken}`
+					}
+				});
+
+				if (response.data.tracks.items.length > 0) {
+
+					songUris.push(response.data.tracks.items[0].uri);
 				}
-			});
-
-			if (response.data.tracks.items.length > 0) {
-				songUris.push(response.data.tracks.items[0].uri);
+			} catch (error) {
+				console.error(`Error fetching song "${song}":`, error);
 			}
-		} catch (error) {
-			console.error(`Error fetching song "${song}":`, error);
+		}
+	} else if (searchMode === "strict") {
+
+
+		for (const song of songs) {
+
+			//buscar exactamente la cancion deseada por el artista deseado
+
+			try {
+				const response = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(song.name)}%20artist:${encodeURIComponent(song.artist)}&type=track&limit=1`, {
+					headers: {
+						'Authorization': `Bearer ${accessToken}`
+					}
+				});
+
+				if (response.data.tracks.items.length > 0) {
+					songUris.push(response.data.tracks.items[0].uri);
+				}
+
+
+			} catch (error) {
+				console.error(`Error fetching song "${song}":`, error);
+			}
 		}
 	}
-
 	return songUris;
 }
 
@@ -60,11 +86,11 @@ async function createSpotifyPlaylist(userId, playlistName, songUris, accessToken
 export default async function handler(req, res) {
 	if (req.method === "POST") {
 		// Extraer la información necesaria del cuerpo de la solicitud
-		const { userId, accessToken, songs, playlistName } = req.body;
+		const { userId, accessToken, songs, playlistName, searchMode } = req.body;
 
 		try {
 			// Obtener las URIs de las canciones
-			const songUris = await fetchSongUris(songs, accessToken);
+			const songUris = await fetchSongUris(songs, accessToken, searchMode);
 
 			// Crear la playlist en Spotify
 			const playlistId = await createSpotifyPlaylist(userId, playlistName, songUris, accessToken);

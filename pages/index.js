@@ -18,15 +18,22 @@ export default function Home() {
 	const [playlistCreated, setPlaylistCreated] = useState(false)
 	const [loadingPlaylist, setLoadingPlaylist] = useState(false)
 	const [addingPlaylist, setAddingPlaylist] = useState(false)
+	const [searchMode, setSearchMode] = useState("relaxed")
+	const [showModal, setShowModal] = useState(false)
 
-	
+
+	const handleSearchModeChange = (e) => {
+		setSearchMode(e.target.value)
+	}
 
 	const handleCreatePlaylist = async (result, accessToken) => {
+		console.log(searchMode)
 		setAddingPlaylist(true)
 		try {
 			const response = await axios.post('/api/spotify', {
 				songs: result,
 				playlistName: title,
+				searchMode: searchMode,
 				userId: session.token.sub, // El ID de usuario de Spotify
 				accessToken, // El token de acceso de Spotify
 			});
@@ -84,6 +91,8 @@ export default function Home() {
 			<meta name="description" content="Create a playlist based on your mood using AI" />
 			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 			<link rel="icon" href="/icon.png" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" />
+
 		</Head>
 		{/* <!-- Google tag (gtag.js) --> */}
 		<Script async src={"https://www.googletagmanager.com/gtag/js?id=G-F7837YT067"} />
@@ -209,6 +218,48 @@ export default function Home() {
 								</li>
 							))}
 						</ul>
+
+						<div className={styles.selectGroup}>
+							<select
+								className={styles.selectInput}
+								name="searchMode"
+								value={searchMode}
+								onChange={handleSearchModeChange}
+							>
+								<option value="relaxed">Relaxed Mode</option>
+								<option value="strict">Strict Mode</option>
+							</select>
+							<button onClick={() => setShowModal(true)} className={styles.helpIcon}>
+								?
+							</button>
+						</div>
+
+						{showModal && (
+							<div className={styles.modal}>
+								<div className={styles.modalContent}>
+									<span
+										className={styles.modalClose}
+										onClick={() => setShowModal(false)}
+									>
+										×
+									</span>
+									<h2>Modes: Strict & Relaxed</h2>
+									<p>
+										Since the AI is not perfect and may not find the exact song you want (or even invent a song that {`doesn't`} exist), there are two modes to choose from.
+									</p>
+									<p>
+										<strong>Strict mode:</strong> Adds songs with exact title and artist match. Results in fewer, but more accurate songs.
+									</p>
+									<p>
+										<strong>Relaxed mode:</strong> More flexible song selection, but may include some incorrect ones.
+									</p>
+									<p>
+										If AI selections are unsatisfactory, try switching modes or manually adding songs.
+									</p>
+								</div>
+							</div>
+						)}
+
 						<button onClick={() => handleCreatePlaylist(result, accessToken)} className={styles.button} disabled={addingPlaylist}>
 							Add to my Spotify account.
 						</button>
@@ -225,7 +276,7 @@ export default function Home() {
 							<p>Adding playlist...</p>
 						</div>)}
 
-						{playlistCreated & !addingPlaylist ? <p>Playlist added!</p> : null}
+						{playlistCreated & !addingPlaylist ? <p style={{ marginTop: "1rem"}}>Playlist added!</p> : null}
 
 					</div>
 				) : null}

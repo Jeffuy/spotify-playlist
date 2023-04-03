@@ -39,7 +39,7 @@ export default async function generate(req, res) {
 
 		let result = textResultToArray(textResult);
 		let title = extractTitle(textResult);
-		
+
 		res.status(200).json({ result: result, title });
 	} catch (error) {
 		// Consider adjusting the error handling logic for your use case
@@ -61,7 +61,8 @@ export default async function generate(req, res) {
 function generatePrompt(typeOfPlaylist, genres, numSongs) {
 	const capitalizedTypeOfPlaylist =
 		typeOfPlaylist[0].toUpperCase() + typeOfPlaylist.slice(1).toLowerCase();
-	return `Crea una playlist de ${numSongs} canciones, géneros ${genres} y tipo ${capitalizedTypeOfPlaylist}. Incluye solo canciones y artistas conocidos y existentes que se ajusten al tipo de playlist. Usa <c> y </c> para cada canción y <t> y </t> para el título de la playlist. Ejemplo: <c>Nombre de la cancion - artista</c>, <t>titulo creativo para la playlist</t>.`;
+	return `Actuarás como un experto en música en todos los idiomas. Conoces cada canción que existe en spotify. Crearás una playlist de ${numSongs} canciones, géneros ${genres} y tipo ${capitalizedTypeOfPlaylist} que existan en spotify. Incluye solo canciones y artistas reales que se encuentren en spotify. No inventes canciones ni artistas. Usa <c> y </c> para cada canción y <t> y </t> para el título de la playlist. Ejemplo: <c>Nombre de la cancion - artista</c>, <t>titulo creativo para la playlist</t>.
+	`;
 }
 
 function textResultToArray(textResult) {
